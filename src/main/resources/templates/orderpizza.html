@@ -1,0 +1,50 @@
+<!DOCTYPE HTML>
+<!--<html lang="en">-->
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Pizza: It's what's for dinner here!</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <!--    <meta charset="UTF-8">-->
+</head>
+<body>
+<!--<p th:text="'Hello, ' + ${name} + '!'"/>-->
+<p th:text="'Welcome to PizzaTime!'"/>
+
+<table>
+    <thead>
+    <tr>
+        <th> Id</th>
+        <th> Description</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:if="${pizzas.empty}">
+        <td colspan="2"> No pizzas yet, order some!</td>
+    </tr>
+    <tr th:each="pizza : ${pizzas}">
+        <td><span th:text="${pizza.id}"> Id </span></td>
+        <td><span th:text="${pizza.description}"> Description </span></td>
+    </tr>
+    </tbody>
+</table>
+
+<!--<tr th:each="pizza: ${pizzas}">-->
+    <form action="#" th:action="@{/savepizza}" th:object="${pizza}" method="post">
+        <table border="1">
+            <tr>
+                <!--            <td><label th:text="#{msg.id}" /></td>-->
+                <td><input type="number" th:field="*{id}"/></td>
+                <!--        </tr>-->
+                <!--        <tr>-->
+                <!--            <td><label th:text="#{msg.id}" /></td>-->
+                <td><input type="text" th:field="*{description}"/></td>
+            </tr>
+            <tr>
+                <td><input type="submit" value="Submit"/></td>
+            </tr>
+        </table>
+    </form>
+<!--</tr>-->
+
+</body>
+</html>
