@@ -28,23 +28,21 @@
     </tbody>
 </table>
 
-<!--<tr th:each="pizza: ${pizzas}">-->
-    <form action="#" th:action="@{/savepizza}" th:object="${pizza}" method="post">
-        <table border="1">
-            <tr>
-                <!--            <td><label th:text="#{msg.id}" /></td>-->
-                <td><input type="number" th:field="*{id}"/></td>
-                <!--        </tr>-->
-                <!--        <tr>-->
-                <!--            <td><label th:text="#{msg.id}" /></td>-->
-                <td><input type="text" th:field="*{description}"/></td>
-            </tr>
-            <tr>
-                <td><input type="submit" value="Submit"/></td>
-            </tr>
-        </table>
-    </form>
-<!--</tr>-->
+<form action="#" th:action="@{/savepizza}" th:object="${pizza}" method="post">
+    <table border="1">
+        <tr>
+            <!--            <td><label th:text="#{msg.id}" /></td>-->
+            <td><input type="number" th:field="*{id}"/></td>
+            <!--        </tr>-->
+            <!--        <tr>-->
+            <!--            <td><label th:text="#{msg.id}" /></td>-->
+            <td><input type="text" th:field="*{description}"/></td>
+        </tr>
+        <tr>
+            <td><input type="submit" value="Submit"/></td>
+        </tr>
+    </table>
+</form>
 
 </body>
 </html>
