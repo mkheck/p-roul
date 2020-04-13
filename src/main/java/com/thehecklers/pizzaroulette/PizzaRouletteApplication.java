@@ -7,21 +7,18 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.messaging.Source;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.cassandra.core.mapping.PrimaryKey;
+import org.springframework.data.cassandra.core.mapping.Table;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.support.MessageBuilder;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
-
-//import javax.persistence.Entity;
-//import javax.persistence.Id;
 
 @SpringBootApplication
 public class PizzaRouletteApplication {
@@ -47,7 +44,6 @@ public class PizzaRouletteApplication {
 
 @EnableBinding(Source.class)
 @Controller
-//@RequiredArgsConstructor
 class PizzaPlanet {
     private final PizzaRepo repo;
     private final Source source;
@@ -56,16 +52,6 @@ class PizzaPlanet {
         this.repo = repo;
         this.source = source;
     }
-
-/*
-	@Bean
-	Supplier<Pizza> sendOrderInfo() {
-		return () -> {
-			System.out.println(this.pizza);
-			return repo.save(this.pizza);
-		};
-	}
-*/
 
     @GetMapping("/")
     public String order(Model model) {
@@ -76,12 +62,10 @@ class PizzaPlanet {
 
     @PostMapping("/savepizza")
     public String savePizza(@ModelAttribute Pizza pizza, Model model) {
-        model.addAttribute("pizzas", repo.findAll());
+        source.output().send(MessageBuilder.withPayload(pizza).build());
 
-        //Mono<Pizza> newPizza = repo.save(pizza);
-        Pizza newPizza = repo.save(pizza).block();
-        source.output().send(MessageBuilder.withPayload(newPizza).build());
-        model.addAttribute("pizza", newPizza);
+        model.addAttribute("pizzas", repo.findAll());
+        model.addAttribute("pizza", repo.save(pizza));
 
         return "redirect:/";
     }
@@ -120,50 +104,12 @@ class PizzaAPI {
     }
 }
 
-//interface PizzaRepo extends ReactiveCrudRepository<Pizza, Long> {
-//}
-
-@Component
-class PizzaRepo {
-    Map<Long, Pizza> pizzas = new HashMap<>();
-
-    Flux<Pizza> findAll() {
-    //Iterable<Pizza> findAll() {
-        return Flux.fromIterable(pizzas.values());
-        //return pizzas.values();
-    }
-
-    Mono<Pizza> findById(Long id) {
-    //Pizza findById(Long id) {
-        return Mono.just(pizzas.get(id));
-        //return pizzas.get(id);
-    }
-
-    Mono<Pizza> save(Pizza pizza) {
-    //Pizza save(Pizza pizza) {
-        pizzas.put(pizza.getId(), pizza);
-
-        Pizza savedPizza = pizzas.get(pizza.getId());
-        System.out.println("PizzaRepo::save: " + savedPizza);
-
-        return Mono.just(savedPizza);
-        //return savedPizza;
-    }
-
-    Mono<Void> deleteAll() {
-    //void deleteAll() {
-        pizzas.clear();
-        return Mono.empty();
-    }
+interface PizzaRepo extends ReactiveCrudRepository<Pizza, Long> {
 }
 
-/*
-@JsonSerialize
-record Pizza (@Id Long id, String description) {}
-*/
-
-@JsonSerialize
+@Table
 class Pizza {
+    @PrimaryKey
     private Long id;
     private String description;
 
